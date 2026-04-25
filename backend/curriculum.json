@@ -1,0 +1,82 @@
+{
+  "courses": [
+    {
+      "id": "cs",
+      "name": "Computer Science",
+      "topics": [
+        {
+          "id": "cs_1",
+          "name": "Variables & Types",
+          "status": "not-started"
+        },
+        {
+          "id": "cs_2",
+          "name": "Loops & Logic",
+          "status": "not-started"
+        },
+        {
+          "id": "cs_3",
+          "name": "Functions",
+          "status": "not-started"
+        },
+        {
+          "id": "cs_4",
+          "name": "Data Structures",
+          "status": "not-started"
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "name": "Math",
+      "topics": [
+        {
+          "id": "math_1",
+          "name": "Algebra Basics",
+          "status": "not-started"
+        },
+        {
+          "id": "math_2",
+          "name": "Geometry",
+          "status": "not-started"
+        },
+        {
+          "id": "math_3",
+          "name": "Probability",
+          "status": "not-started"
+        },
+        {
+          "id": "math_4",
+          "name": "Calculus Intro",
+          "status": "not-started"
+        }
+      ]
+    },
+    {
+      "id": "physics",
+      "name": "Physics",
+      "topics": [
+        {
+          "id": "physics_1",
+          "name": "Motion & Forces",
+          "status": "not-started"
+        },
+        {
+          "id": "physics_2",
+          "name": "Energy",
+          "status": "not-started"
+        },
+        {
+          "id": "physics_3",
+          "name": "Waves",
+          "status": "not-started"
+        },
+        {
+          "id": "physics_4",
+          "name": "Electricity Basics",
+          "status": "not-started"
+        }
+      ]
+    }
+  ]
+}
