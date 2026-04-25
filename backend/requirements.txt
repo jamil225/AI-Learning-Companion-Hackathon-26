@@ -2,6 +2,7 @@ fastapi
 uvicorn
 google-genai
 google-auth
+google-cloud-logging
 pdfplumber
 pydantic
 python-multipart

@@ -273,32 +273,32 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 text-gray-900 font-sans">
-      <header className="flex justify-between items-center p-4 bg-white shadow z-10">
+      <header role="banner" className="flex justify-between items-center p-4 bg-white shadow z-10">
         <h1 className="text-2xl font-bold text-indigo-600">Learning Companion</h1>
         <div className="flex space-x-6 items-center">
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500 font-medium">Curriculum Progress</span>
-            <div className="w-48 bg-gray-200 rounded-full h-2.5 mt-1">
-              <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${(progress.completed_count / 12) * 100}%` }}></div>
-            </div>
-          </div>
-          <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm">
+          <div
+            className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm"
+            aria-label={`${progress.xp} experience points earned`}
+            role="status"
+          >
             ⭐ {progress.xp} XP
           </div>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto p-4 shrink-0">
+        <nav aria-label="Course navigation" className="w-64 bg-white border-r border-gray-200 overflow-y-auto p-4 shrink-0">
           <h2 className="text-lg font-bold mb-4 text-gray-700">Courses</h2>
           {courses.map(course => (
             <div key={course.id} className="mb-4">
               <button
                 onClick={() => setCollapsedCourses(prev => ({ ...prev, [course.id]: !prev[course.id] }))}
+                aria-expanded={!collapsedCourses[course.id]}
+                aria-controls={`course-topics-${course.id}`}
                 className="w-full flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs text-gray-400 transition-transform duration-200 ${collapsedCourses[course.id] ? '' : 'rotate-90'}`}>&#9654;</span>
+                  <span aria-hidden="true" className={`text-xs text-gray-400 transition-transform duration-200 ${collapsedCourses[course.id] ? '' : 'rotate-90'}`}>&#9654;</span>
                   <h3 className="font-semibold text-gray-800 uppercase tracking-wide text-sm">{course.name}</h3>
                 </div>
                 {(() => {
@@ -323,26 +323,33 @@ function App() {
                   );
                 })()}
               </button>
-              {!collapsedCourses[course.id] && <ul className="space-y-2 mt-2 ml-4">
-                {course.topics.map(topic => (
-                  <li 
-                    key={topic.id} 
-                    onClick={() => handleTopicSelect(topic)}
-                    className={`cursor-pointer p-2 rounded transition-colors flex items-center justify-between group ${selectedTopic?.id === topic.id ? 'bg-indigo-100 border-l-4 border-indigo-500' : 'hover:bg-indigo-50'}`}
-                  >
-                    <span className={`text-sm ${selectedTopic?.id === topic.id ? 'text-indigo-800 font-semibold' : 'text-gray-600 group-hover:text-indigo-700'}`}>
-                      {topic.name}
-                    </span>
-                    {topic.status === 'completed' && <span className="text-green-500 text-xs">✅</span>}
-                    {topic.status === 'in-progress' && <span className="text-yellow-500 text-xs">⏳</span>}
-                  </li>
-                ))}
-              </ul>}
+              {!collapsedCourses[course.id] && (
+                <ul id={`course-topics-${course.id}`} className="space-y-2 mt-2 ml-4" role="list">
+                  {course.topics.map(topic => (
+                    <li
+                      key={topic.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-current={selectedTopic?.id === topic.id ? 'page' : undefined}
+                      aria-label={`${topic.name}${topic.status === 'completed' ? ', completed' : topic.status === 'in-progress' ? ', in progress' : ''}`}
+                      onClick={() => handleTopicSelect(topic)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleTopicSelect(topic)}
+                      className={`cursor-pointer p-2 rounded transition-colors flex items-center justify-between group ${selectedTopic?.id === topic.id ? 'bg-indigo-100 border-l-4 border-indigo-500' : 'hover:bg-indigo-50'}`}
+                    >
+                      <span className={`text-sm ${selectedTopic?.id === topic.id ? 'text-indigo-800 font-semibold' : 'text-gray-600 group-hover:text-indigo-700'}`}>
+                        {topic.name}
+                      </span>
+                      {topic.status === 'completed' && <span aria-hidden="true" className="text-green-500 text-xs">✅</span>}
+                      {topic.status === 'in-progress' && <span aria-hidden="true" className="text-yellow-500 text-xs">⏳</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
-        </aside>
+        </nav>
 
-        <main className="flex-1 bg-gray-50 overflow-y-auto p-8 flex flex-col items-center">
+        <main id="main-content" role="main" aria-label="Lesson content" className="flex-1 bg-gray-50 overflow-y-auto p-8 flex flex-col items-center">
           {!selectedTopic ? (
             <div className="max-w-3xl w-full bg-white rounded-xl shadow-sm p-10 text-center border border-gray-100 mt-20">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome to your Learning Companion</h2>
@@ -353,14 +360,17 @@ function App() {
               <h2 className="text-3xl font-bold text-gray-800 mb-6">Configure Topic: {selectedTopic.name}</h2>
               
               <div className="mb-6">
-                <label className="block text-gray-700 font-semibold mb-2">What do you want to learn? (Optional)</label>
-                <textarea 
+                <label htmlFor="user-prompt" className="block text-gray-700 font-semibold mb-2">What do you want to learn? (Optional)</label>
+                <textarea
+                  id="user-prompt"
+                  aria-describedby="user-prompt-hint"
                   className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   rows="3"
                   placeholder="e.g. 'I want to focus heavily on practical examples rather than theory...'"
                   value={userPrompt}
                   onChange={(e) => setUserPrompt(e.target.value)}
                 />
+                <p id="user-prompt-hint" className="sr-only">Optionally describe what you want to focus on in this topic</p>
               </div>
 
               <div className="mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
@@ -390,19 +400,21 @@ function App() {
               </div>
 
               <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100">
-                <button 
-                  onClick={() => loadLesson(selectedTopic, userPrompt)} 
+                <button
+                  onClick={() => loadLesson(selectedTopic, userPrompt)}
                   disabled={isUploading}
+                  aria-disabled={isUploading}
                   className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md disabled:opacity-50"
                 >
                   Generate Custom Lesson
                 </button>
-                <button 
+                <button
                   onClick={() => loadLesson(selectedTopic, "")}
                   disabled={isUploading}
+                  aria-disabled={isUploading}
                   className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors disabled:opacity-50"
                 >
-                  Skip & Start Default
+                  Skip &amp; Start Default
                 </button>
               </div>
             </div>
@@ -426,8 +438,8 @@ function App() {
 
               <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100 min-h-[400px]">
                 {isLoadingLesson || isLoadingQuiz ? (
-                  <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+                  <div role="status" aria-live="polite" aria-label={isLoadingQuiz ? 'Generating quiz' : 'Generating lesson'} className="flex flex-col items-center justify-center h-64 text-gray-500">
+                    <div aria-hidden="true" className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
                     {isLoadingQuiz ? 'Generating your quiz using Gemini...' : 'Generating your lesson using Gemini...'}
                   </div>
                 ) : isQuizMode ? (
@@ -478,40 +490,53 @@ function App() {
           )}
         </main>
 
-        <aside className="w-80 bg-white border-l border-gray-200 flex flex-col shadow-inner shrink-0">
+        <aside aria-label="Tutor chat" className="w-80 bg-white border-l border-gray-200 flex flex-col shadow-inner shrink-0">
           <div className="p-4 border-b border-gray-100 bg-indigo-50">
             <h2 className="text-lg font-bold text-indigo-900 flex items-center">
-              <span className="mr-2">💬</span> Tutor Chat
+              <span aria-hidden="true" className="mr-2">💬</span> Tutor Chat
             </h2>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+
+          <div
+            role="log"
+            aria-live="polite"
+            aria-label="Chat messages"
+            className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"
+          >
             {!selectedTopic ? (
-              <div className="text-sm text-gray-500 text-center mt-4 italic">Select a topic to start chatting with your AI tutor.</div>
+              <p className="text-sm text-gray-500 text-center mt-4 italic">Select a topic to start chatting with your AI tutor.</p>
             ) : chatMessages.length === 0 ? (
-              <div className="text-sm text-gray-500 text-center mt-4">Hi! Ask me any questions about {selectedTopic.name}.</div>
+              <p className="text-sm text-gray-500 text-center mt-4">Hi! Ask me any questions about {selectedTopic.name}.</p>
             ) : (
               chatMessages.map((msg, idx) => (
-                <div key={idx} className={`max-w-[85%] p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white self-end rounded-tr-none' : 'bg-gray-100 text-gray-800 self-start rounded-tl-none prose prose-sm prose-indigo'}`}>
+                <div
+                  key={idx}
+                  role="article"
+                  aria-label={msg.role === 'user' ? 'Your message' : 'Tutor reply'}
+                  className={`max-w-[85%] p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white self-end rounded-tr-none' : 'bg-gray-100 text-gray-800 self-start rounded-tl-none prose prose-sm prose-indigo'}`}
+                >
                   {msg.role === 'tutor' ? <ReactMarkdown>{msg.text}</ReactMarkdown> : msg.text}
                 </div>
               ))
             )}
             {isChatting && (
-              <div className="bg-gray-100 text-gray-800 self-start p-3 rounded-lg rounded-tl-none max-w-[85%] text-sm flex gap-1 items-center">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div role="status" aria-label="Tutor is typing" className="bg-gray-100 text-gray-800 self-start p-3 rounded-lg rounded-tl-none max-w-[85%] text-sm flex gap-1 items-center">
+                <div aria-hidden="true" className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div aria-hidden="true" className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div aria-hidden="true" className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
           <div className="p-4 border-t border-gray-200 bg-gray-50">
-            <input 
-              type="text" 
+            <label htmlFor="chat-input" className="sr-only">Ask your tutor a question</label>
+            <input
+              id="chat-input"
+              type="text"
               placeholder={selectedTopic ? "Ask a question and press Enter..." : "Select a topic first"}
               disabled={!selectedTopic || isChatting}
+              aria-disabled={!selectedTopic || isChatting}
               value={currentMessage}
               onChange={(e) => setCurrentMessage(e.target.value)}
               onKeyDown={handleSendMessage}

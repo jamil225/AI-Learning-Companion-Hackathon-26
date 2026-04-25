@@ -9,6 +9,7 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 from google.auth import default as google_auth_default
+import google.cloud.logging as cloud_logging
 import pdfplumber
 from dotenv import load_dotenv
 import logging
@@ -16,9 +17,6 @@ import logging
 BASE_DIR = Path(__file__).resolve().parent
 ROOT_DIR = BASE_DIR.parent
 
-# Load env files explicitly so local Vertex AI config can live in either:
-# - repo root .env
-# - backend/.env
 load_dotenv(ROOT_DIR / ".env")
 load_dotenv(BASE_DIR / ".env", override=True)
 
@@ -27,13 +25,11 @@ def normalize_google_credentials_path() -> None:
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if not credentials_path:
         return
-
     candidate = Path(credentials_path).expanduser()
     if not candidate.is_absolute():
         root_candidate = (ROOT_DIR / candidate).resolve()
         backend_candidate = (BASE_DIR / candidate).resolve()
         candidate = root_candidate if root_candidate.exists() else backend_candidate
-
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(candidate)
 
 
@@ -41,6 +37,15 @@ normalize_google_credentials_path()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+# Set up Google Cloud Logging (sends logs to Cloud Logging on GCP)
+try:
+    cloud_log_client = cloud_logging.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
+    cloud_log_client.setup_logging()
+    logger.info("Google Cloud Logging enabled for project: %s", os.getenv("GOOGLE_CLOUD_PROJECT"))
+except Exception as _cloud_log_err:
+    logger.info("Google Cloud Logging not available locally, using standard logging: %s", _cloud_log_err)
+
 client_init_error = "Vertex AI client not initialized"
 
 app = FastAPI(title="Learning Companion API")
