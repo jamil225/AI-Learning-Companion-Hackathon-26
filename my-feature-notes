@@ -1,0 +1,19 @@
+1. ui -> side panel showing all topics in a course
+2. user can click any topic to jump to it
+3. Each topic has subtopics which can also be clicked
+4. 
+
+flow idea -> 
+1. User selects a course
+2. User selects a topic -> 
+4. User sees the lsit of content for the topic : 
+    -then will get pre populted text to study (This content can be created using The content is used for that topi,
+    - and also my AI system fills the gate in a structured way to learn Simply extract the text from the PDF for the topic Don't go with the chunking in the RAG as  of now! ), 
+    -if for The topic of the if  User can pop up the site chat to learn more about that particular thing which he is learning Ask questions while learning 
+    -Also each topic study session will have a button : "Explain like I'm 5" button
+    -user had good understanding one We'll have the next step of a quiz for that topic Based on that we will show the leaderboard in terms of how many topics he has completed and how much score for his topics 
+5. User can ask questions about the content
+6. AI answers with context of the topic  the questions
+
+
+The development approach is first to move on the essential must-do part We'll go on bettter high scoring features  
